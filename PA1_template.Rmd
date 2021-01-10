@@ -5,21 +5,100 @@ output:
     keep_md: true
 ---
 
+## Setup essential packages for analysis below
+```{r setup, include = FALSE}
+library(ggplot2)
+library(dplyr)
+require(data.table)
+require(lubridate)
+require(stringr)
+```
 
 ## Loading and preprocessing the data
-
-
+```{R}
+activity = read.table("activity.csv", header = T, na.strings = "NA", sep = ",")
+activity$date = ymd(activity$date)
+activity$interval = str_pad(activity$interval, width = 4, side = "left", pad = "0")
+activity$datetime = ymd_hm(paste(activity$date, activity$interval))
+str(activity)
+```
 
 ## What is mean total number of steps taken per day?
+1. Sum of all steps per day
+```{R}
+sum.act = aggregate(activity$steps, by = list(activity$date), FUN=sum, na.rm = T)
+names(sum.act) = c("date", "totalsteps")
+```
+2. Histogram of total number of steps per day
+```{R}
+hist(sum.act$totalsteps, main = "Total number of steps per day", xlab = "Number of steps per day")
+```
 
-
-
+3. Mean and Median of total number of steps per day
+```{R}
+print(paste0("Mean: ",mean(sum.act$totalsteps), " ; Median: ", median(sum.act$totalsteps)))
+```
 ## What is the average daily activity pattern?
-
-
+1. Time Series Plot: Mean of steps per 5-min interval
+```{R}
+mean.intact = aggregate(activity$steps, by = list(activity$interval), FUN=mean, na.rm = T)
+names(mean.intact) = c("int", "meanact")
+plot(mean.intact$int, mean.intact$meanact, type = "l", main = "Mean of steps per 5-min interval", xlab = "5-min interval", ylab = "Mean steps")
+```
+2. Maximum number of steps on average
+```{R}
+print(paste0("Maximum number of steps on average is in ", mean.intact$int[which.max(mean.intact$meanact)], " hrs."))
+```
 
 ## Imputing missing values
+1. Count number of NA
+```{R}
+summary(activity)
+```
 
+2. Fill in NA values with interval mean and
+3. Creation of new dataset
+```{R}
+activity2 = activity
+for(i in 1:nrow(activity2)) {
+  if (is.na(activity2[i,1])) {
+    activity2[i,1] = mean.intact[match(activity2[i,3], mean.intact$int),2]
+  }
+}
+```
+Sum of all steps per day after imputing missing
+```{R}
+sum.act2 = aggregate(activity2$steps, by = list(activity2$date), FUN=sum, na.rm = T)
+names(sum.act2) = c("date", "totalsteps")
+```
+4. Histogram of total number of steps per day imputing missing
+```{R}
+hist(sum.act2$totalsteps, main = "Total number of steps per day after imputing missing", xlab = "Number of steps per day")
+```
 
-
+Mean and Median of total number of steps per day imputing missing
+```{R}
+print(paste0("Old Mean: ",round(mean(sum.act$totalsteps), 2), " ; Old Median: ", median(sum.act$totalsteps)))
+print(paste0("New Mean: ",round(mean(sum.act2$totalsteps), 2), " ; New Median: ", round(median(sum.act2$totalsteps))))
+```
 ## Are there differences in activity patterns between weekdays and weekends?
+
+1. Recoding weekday variable
+```{R}
+activity2$weekday = wday(activity2$date, label = FALSE)
+activity2$weekday = ifelse(activity2$weekday <= 5, "weekday", "weekend")
+activity2$weekday = as.factor(activity2$weekday)
+```
+2. Mean of intervals by weekend and weekday
+```{R}
+meanwk = activity2 %>%
+  group_by(weekday, interval) %>%
+  summarise(mean = mean(steps))
+```
+Comparison plot
+Histogram of total number of steps per day imputing missing
+```{R}
+ggplot(meanwk, aes(x=interval, y=mean, group = 1)) + geom_line() +
+    facet_grid(rows = vars(weekday)) + xlab("5-mins Interval") + ylab("Mean Steps") +
+    ggtitle("Walking patterns by time of week") + scale_x_discrete(breaks  = c("0000", "0600", "1200","1800","2400"))
+```
