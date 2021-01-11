@@ -40,7 +40,7 @@ names(sum.act) = c("date", "totalsteps")
 hist(sum.act$totalsteps, main = "Total number of steps per day", xlab = "Number of steps per day")
 ```
 
-![](r1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](figures/unnamed-chunk-3-1.png)<!-- -->
 
 3. Mean and Median of total number of steps per day
 
@@ -61,6 +61,7 @@ plot(mean.intact$int, mean.intact$meanact, type = "l", main = "Mean of steps per
 ```
 
 ![](figures/unnamed-chunk-5-1.png)<!-- -->
+
 2. Maximum number of steps on average
 
 ```r
@@ -120,7 +121,7 @@ names(sum.act2) = c("date", "totalsteps")
 hist(sum.act2$totalsteps, main = "Total number of steps per day after imputing missing", xlab = "Number of steps per day")
 ```
 
-![](r1_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](figures/unnamed-chunk-10-1.png)<!-- -->
 
 Mean and Median of total number of steps per day imputing missing
 
@@ -168,4 +169,4 @@ ggplot(meanwk, aes(x=interval, y=mean, group = 1)) + geom_line() +
     ggtitle("Walking patterns by time of week") + scale_x_discrete(breaks  = c("0000", "0600", "1200","1800","2400"))
 ```
 
-![](r1_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](figures/unnamed-chunk-14-1.png)<!-- -->
