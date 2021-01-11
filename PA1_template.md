@@ -60,7 +60,7 @@ names(mean.intact) = c("int", "meanact")
 plot(mean.intact$int, mean.intact$meanact, type = "l", main = "Mean of steps per 5-min interval", xlab = "5-min interval", ylab = "Mean steps")
 ```
 
-![](r1_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](figures/unnamed-chunk-5-1.png)<!-- -->
 2. Maximum number of steps on average
 
 ```r
